@@ -6,10 +6,10 @@ from mysql.connector import errorcode
 # Connect to database
 try:
     cnx = mysql.connector.connect(
-        user='root', 
-        password='root',
+        user='server', 
+        password='thisisnotagoodpassword',
         host='swadeslab.rose-hulman.edu',
-        database='finalproject')
+        database='spandora')
     cursor = cnx.cursor()
 except mysql.connector.Error as err:
     if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -41,3 +41,6 @@ for row in cursor:
 cursor.close()
 cnx.close()
 
+if __name__ == "__main__":
+    print("Hello World")
+    
