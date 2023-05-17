@@ -23,6 +23,11 @@ class S(BaseHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
         self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate')
         return super(S, self).end_headers()
+    
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.end_headers()
+        return
 
     def do_GET(self):
 
