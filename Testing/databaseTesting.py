@@ -1,45 +1,40 @@
 # Setup file for mySQL database testing
 
 import mysql.connector
-from mysql.connector import errorcode
 
 # Connect to database
-try:
-    cnx = mysql.connector.connect(
-        user='server', 
-        password='thisisnotagoodpassword',
-        host='swadeslab.rose-hulman.edu',
-        database='spandora')
-    cursor = cnx.cursor()
-except mysql.connector.Error as err:
-    if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-        print("Something is wrong with your username or password.")
-    elif err.errno == errorcode.ER_BAD_DB_ERROR:
-        print("Database does not exist.")
-    else:
-        print(err)
+ourDB = mysql.connector.connect(
+    user='william', 
+    password='changeme',
+    host='swadeslab.rose-hulman.edu',
+    database='SpandoraDB')
+cursor = ourDB.cursor()
 
-# Create table
-TABLES = {}
-TABLES['test'] = (
-    "CREATE TABLE `test` ("
-    "  `id` int(11) NOT NULL AUTO_INCREMENT,"
-    "  `name` varchar(14) NOT NULL,"
-    "  `age` int(3) NOT NULL,"
-    "  PRIMARY KEY (`id`)"
-    ") ENGINE=InnoDB")
-
-# Insert data into table
-cursor.execute("INSERT INTO test (name, age) VALUES (%s, %s)", ('John Smith', 25))
+# Insert data into Song_Library table
+# cursor.execute("INSERT INTO Song_Library (Song_Name, Artist_Name, Album_Name, Genre, Song_Length, Song_Path, Song_ID) VALUES (%s, %s, %s, %s, %s, %s, %s)", ("Song1", "Artist1", "Album1", "Genre1", "1:00", "Path1", "69696969"))
 
 # Query data from table
-cursor.execute("SELECT * FROM test")
+cursor.execute("SELECT * FROM Song_Library")
 for row in cursor:
+    print(row)
+
+cursor.execute("SELECT MAX(Song_ID) FROM Song_Library")
+for row in cursor:
+    # Remove commas from row
+    row = str(row).replace(',', '')
+
+    # Remove parentheses from row
+    row = str(row).replace('(', '')
+    row = str(row).replace(')', '')
+    
+    # Remove apostrophes from row
+    row = str(row).replace('\'', '')
+    
     print(row)
 
 # Close connection
 cursor.close()
-cnx.close()
+ourDB.close()
 
 if __name__ == "__main__":
     print("Hello World")
