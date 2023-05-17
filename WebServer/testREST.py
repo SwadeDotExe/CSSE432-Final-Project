@@ -57,8 +57,8 @@ class S(BaseHTTPRequestHandler):
         # API Request - Stop
         if str(self.path).startswith('/api/stop'):
             print("API Request -- Play")
-            self.wfile.write("{}".format("gonna keep going now").encode('utf-8'))
-            resumeSong()
+            self.wfile.write("{}".format("gonna stop for good now").encode('utf-8'))
+            stopSong()
             return
         
 
@@ -321,6 +321,9 @@ def pauseSong():
 
 def resumeSong():
     mixer.music.unpause()
+
+def stopSong():
+    mixer.music.stop()
 
 if __name__ == '__main__':
     from sys import argv
