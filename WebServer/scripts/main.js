@@ -37,7 +37,7 @@ spandora.PageController = class {
     }
 
     initializeView() {
-        this.updateQueue();
+        // this.updateQueue();
         this.updateSongList();
     }
 
@@ -90,19 +90,29 @@ spandora.PageController = class {
         // Passes song request to server which returns song list
         spandora.songServerManager.getSongs()
         .then((data) => {
-            this._updateSongListHelper(data)
+            console.log(data);
+            this._testUpdateSongList(data)
         })
         .catch(err => {
 			console.log(err);
 		});
 	}
 
+    _testUpdateSongList(data) {
+        let fullSongList = data;
+        for (let i = 0; i < fullSongList.length; i++) {
+            let stringData = fullSongList[i].split("_");
+            const song = new Song(stringData);
+            console.log(song);
+        }
+    }
+
     _updateSongListHelper(data) {
         let fullSongsList = data;
         const newSongList = htmlToElement(`<div id="songListContainer"></div>`);
         for (let i = 0; i < fullSongsList.length; i++) {
             // Get item from json as a song
-            const song = new Song(data[i]);
+            const song = new Song(fullSongsList[i]);
             const newSong = spandora.pageController._createListedSong(song);
             newSong.onclick = (event) => {
 				this._searchedSongID = newSong.id;
@@ -154,10 +164,10 @@ spandora.PageController = class {
 
 /** Song Class for making things easier */
 spandora.Song = class {
-	constructor(id, songName, artist) {
-		this.id = id;
-		this.songName = songName;
-		this.artist = artist;
+	constructor(songData) {
+		this.songName = songData[0];
+        this.id = songData[1];
+		this.artist = songData[2];
 	}
 }
 
@@ -184,6 +194,7 @@ spandora.SongServerManager = class {
             fetch(apiUrl + "songlist/")
             .then((response) => response.json())
             .then((data) => {
+                console.log(data);
                 resolve(data);
             })
             .catch(err => {
@@ -212,7 +223,7 @@ spandora.SongServerManager = class {
 /* Main to start everything */
 spandora.main = function () {
     console.log("Ready");
-    spandora.songManager = new spandora.SongServerManager();
+    spandora.songServerManager = new spandora.SongServerManager();
     spandora.pageController = new spandora.PageController(); 
 
 };
