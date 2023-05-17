@@ -5,6 +5,7 @@ import logging
 import mysql.connector
 import audio_metadata
 import os
+import json
 from pygame import mixer
 
 # Initialize mixer
@@ -17,7 +18,7 @@ class S(BaseHTTPRequestHandler):
         self.end_headers()
 
     def end_headers(self):
-        self.send_header('Access-Control-Allow-Origin', '')
+        self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', '')
         self.send_header('Access-Control-Allow-Headers', '*')
         self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate')
@@ -26,7 +27,6 @@ class S(BaseHTTPRequestHandler):
     def do_GET(self):
 
         self._set_response()
-        global playBool
 
         # API Request - Songlist
         if str(self.path).startswith('/api/songlist'):
@@ -68,8 +68,6 @@ class S(BaseHTTPRequestHandler):
             stopSong()
             return
         
-        
-
     def do_POST(self):
         content_length = int(self.headers['Content-Length']) # <--- Gets the size of data
         post_data = self.rfile.read(content_length) # <--- Gets the data itself
@@ -95,7 +93,6 @@ class S(BaseHTTPRequestHandler):
             # Add the song to queue
             addSongtoQueue(post_data) # Expecting songID
             return
-        
 
 def run(server_class=HTTPServer, handler_class=S, port=9000):
     logging.basicConfig(level=logging.INFO)
@@ -108,8 +105,6 @@ def run(server_class=HTTPServer, handler_class=S, port=9000):
         pass
     httpd.server_close()
     logging.info('Stopping httpd...\n')
-
-
 
 # Function to handle mySQL database requests
 def getSongList(self):
@@ -162,6 +157,9 @@ def getSongList(self):
 
         # Add each row to r
         r.append(row)
+
+    # Convert r to JSON
+    r = json.dumps(r)
 
     # Close connection
     cursor.close()
@@ -334,7 +332,6 @@ def resumeSong():
 
 def stopSong():
     mixer.music.stop()
-
 
 if __name__ == '__main__':
     from sys import argv

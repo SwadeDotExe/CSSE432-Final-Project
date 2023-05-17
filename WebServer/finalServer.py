@@ -5,21 +5,40 @@ import logging
 import mysql.connector
 import audio_metadata
 import os
+import json
 from pygame import mixer
 
 # Initialize mixer
 mixer.init()
 
+my_host_name = 'localhost'
+my_port = 6969
+my_html_folder_path = '/Users/swade/Library/CloudStorage/GoogleDrive-swade@swadesdesigns.com/My Drive/College/Classes/CSSE432/FinalProject/WebServer'
+#my_html_folder_path = '/home/fosswe/csse432/CSSE432-Final-Project/WebServer'
+
+my_home_page_file_path = 'index.html'
+
 class S(BaseHTTPRequestHandler):
     def _set_response(self):
         self.send_response(200)
-        self.send_header('Content-type', 'text/html')
+        # Check if sending CSS File
+        if self.path.endswith('.css'):
+            self.send_header('Content-Type', 'text/css')
+        else:
+            self.send_header('Content-Type', 'text/html')
+        # self.send_header('Content-Length', self.path.getsize(self.getPath()))
         self.end_headers()
+
+    def end_headers(self):
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', '')
+        self.send_header('Access-Control-Allow-Headers', '*')
+        self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate')
+        return super(S, self).end_headers()
 
     def do_GET(self):
 
         self._set_response()
-        global playBool
 
         # API Request - Songlist
         if str(self.path).startswith('/api/songlist'):
@@ -60,8 +79,10 @@ class S(BaseHTTPRequestHandler):
             self.wfile.write("{}".format("gonna stop for good now").encode('utf-8'))
             stopSong()
             return
-        
 
+        print("URL requested: %s" % self.path)
+        self.wfile.write(self.getContent(self.getPath()))
+        
     def do_POST(self):
         content_length = int(self.headers['Content-Length']) # <--- Gets the size of data
         post_data = self.rfile.read(content_length) # <--- Gets the data itself
@@ -88,8 +109,35 @@ class S(BaseHTTPRequestHandler):
             addSongtoQueue(post_data) # Expecting songID
             return
         
+    def getPath(self):
 
-def run(server_class=HTTPServer, handler_class=S, port=9000):
+        # API Request - Songlist
+        if str(self.path).startswith('/api/songlist'):
+
+            print("API Request -- Songlist")
+
+            songList = getSongList(self)
+
+            # Respond to API request
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Data', songList)
+            self.send_header('Content-Length', len(songList))
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+
+            # Set requested path to homepage for simplicity
+            self.path = '/'
+
+        content_path = my_html_folder_path + '/' + my_home_page_file_path
+        return content_path
+
+    def getContent(self, content_path):
+        with open(content_path, mode='rb') as f:
+            content = f.read()
+        return bytes(content)
+
+def run(server_class=HTTPServer, handler_class=S, port=my_port):
     logging.basicConfig(level=logging.INFO)
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
@@ -152,6 +200,9 @@ def getSongList(self):
 
         # Add each row to r
         r.append(row)
+
+    # Convert r to JSON
+    r = json.dumps(r)
 
     # Close connection
     cursor.close()
