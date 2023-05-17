@@ -11,7 +11,7 @@ var spandora = spandora || {};
 
 /* globals */
 spandora.variableName = "";
-const apiUrl = window.location.href + "/api/";
+const apiUrl = "http://localhost:9000/api/";
 spandora.pageController = null;
 spandora.songServerManager = null;
 

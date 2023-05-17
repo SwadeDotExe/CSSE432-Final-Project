@@ -16,13 +16,6 @@ class S(BaseHTTPRequestHandler):
         self.send_header('Content-type', 'text/html')
         self.end_headers()
 
-    def end_headers(self):
-        self.send_header('Access-Control-Allow-Origin', '')
-        self.send_header('Access-Control-Allow-Methods', '')
-        self.send_header('Access-Control-Allow-Headers', '*')
-        self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate')
-        return super(S, self).end_headers()
-
     def do_GET(self):
 
         self._set_response()
@@ -68,7 +61,6 @@ class S(BaseHTTPRequestHandler):
             stopSong()
             return
         
-        
 
     def do_POST(self):
         content_length = int(self.headers['Content-Length']) # <--- Gets the size of data
@@ -108,8 +100,6 @@ def run(server_class=HTTPServer, handler_class=S, port=9000):
         pass
     httpd.server_close()
     logging.info('Stopping httpd...\n')
-
-
 
 # Function to handle mySQL database requests
 def getSongList(self):
@@ -334,7 +324,6 @@ def resumeSong():
 
 def stopSong():
     mixer.music.stop()
-
 
 if __name__ == '__main__':
     from sys import argv
