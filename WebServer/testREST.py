@@ -10,9 +10,6 @@ from pygame import mixer
 # Initialize mixer
 mixer.init()
 
-# Variable to determine if music is paused or not
-playBool = 1 # 1 = playing, 0 = paused
-
 class S(BaseHTTPRequestHandler):
     def _set_response(self):
         self.send_response(200)
@@ -22,6 +19,7 @@ class S(BaseHTTPRequestHandler):
     def do_GET(self):
 
         self._set_response()
+        global playBool
 
         # API Request - Songlist
         if str(self.path).startswith('/api/songlist'):
@@ -32,15 +30,35 @@ class S(BaseHTTPRequestHandler):
         # API Request - Queue
         if str(self.path).startswith('/api/queue'):
             print("API Request -- Queue")
-            self.wfile.write("{}".format(getSongList(self)).encode('utf-8'))
+            self.wfile.write("{}".format(getSongQueue()).encode('utf-8'))
             return
         
         # API Request - Play
         if str(self.path).startswith('/api/play'):
             print("API Request -- Play")
             self.wfile.write("{}".format("gonna play now").encode('utf-8'))
-            playBool = 1
-            playSong(playBool)
+            playSong()
+            return
+    
+        # API Request - Pause
+        if str(self.path).startswith('/api/pause'):
+            print("API Request -- Play")
+            self.wfile.write("{}".format("gonna stop now").encode('utf-8'))
+            pauseSong()
+            return
+        
+        # API Request - Resume
+        if str(self.path).startswith('/api/resume'):
+            print("API Request -- Play")
+            self.wfile.write("{}".format("gonna keep going now").encode('utf-8'))
+            resumeSong()
+            return
+        
+        # API Request - Stop
+        if str(self.path).startswith('/api/stop'):
+            print("API Request -- Play")
+            self.wfile.write("{}".format("gonna keep going now").encode('utf-8'))
+            resumeSong()
             return
         
 
@@ -71,7 +89,7 @@ class S(BaseHTTPRequestHandler):
             return
         
 
-def run(server_class=HTTPServer, handler_class=S, port=8080):
+def run(server_class=HTTPServer, handler_class=S, port=9000):
     logging.basicConfig(level=logging.INFO)
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
@@ -244,12 +262,9 @@ def removeSongfromQueue(songID):
 
     return
 
-def playSong(bool):
-    
-    # Set local boolean in GET to global
-    playBool = bool
+def getSongQueue():
 
-        # Connect to database
+    # Connect to database
     ourDB = mysql.connector.connect(
         user='william', 
         password='changeme',
@@ -258,14 +273,12 @@ def playSong(bool):
     cursor = ourDB.cursor()
 
     # Query data from table
-    cursor.execute("SELECT Song_Name,Song_ID,Artist_Name FROM Song_Library")
+    cursor.execute("SELECT Song_ID FROM Queue")
 
-    # Make JSON containing all rows for response
-    r = []
-
-    # Loop through each row in cursor
+    # Get songs in queue
+    songQueue = []
     for row in cursor:
-
+            
         # Remove commas from row
         row = str(row).replace(',', '')
 
@@ -276,50 +289,38 @@ def playSong(bool):
         # Remove apostrophes from row
         row = str(row).replace('\'', '')
 
-        # Find index of first number in row
-        index = 0
-        for i in range(len(row)):
-            if row[i].isdigit():
-                index = i
-                break
-        
-        # Replace char at index -1 with underscore
-        row = row[:index-1] + "_" + row[index-1+1:]
-
-        # Find index of last number in row
-        index = 0
-        for i in range(len(row)):
-            if row[i].isdigit():
-                index = i
-
-        # Replace char at index + 1 with underscore
-        row = row[:index+1] + "_" + row[index+1+1:]
-
         # Add each row to r
-        r.append(row)
+        songQueue.append(row)
 
     # Close connection
     cursor.close()
     ourDB.close()
 
-    # Print r
-    print(r)
+    print(songQueue)
+    return songQueue
 
-    # Return JSON response
-    return r
+def playSong():
+
+    # Get songs in queue
+    songsInQueue = getSongQueue()
+
+    # Get first song in queue
+    songID = songsInQueue[0]
 
     # Create song path
     songPath = "../AudioFiles/" + str(songID) + ".mp3"
     mixer.music.load(songPath)
     mixer.music.set_volume(0.5)
     mixer.music.play()
-    while True:
-        if playBool == 0:
-            mixer.music.pause()
-            # wait until playBool is 1
-            while playBool == 0:
-                pass
-            mixer.music.unpause()
+
+    # Remove song from queue
+    removeSongfromQueue(songID)
+
+def pauseSong():
+    mixer.music.pause()
+
+def resumeSong():
+    mixer.music.unpause()
 
 if __name__ == '__main__':
     from sys import argv
