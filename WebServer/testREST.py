@@ -5,6 +5,13 @@ import logging
 import mysql.connector
 import audio_metadata
 import os
+from pygame import mixer
+
+# Initialize mixer
+mixer.init()
+
+# Variable to determine if music is paused or not
+playBool = 1 # 1 = playing, 0 = paused
 
 class S(BaseHTTPRequestHandler):
     def _set_response(self):
@@ -26,6 +33,14 @@ class S(BaseHTTPRequestHandler):
         if str(self.path).startswith('/api/queue'):
             print("API Request -- Queue")
             self.wfile.write("{}".format(getSongList(self)).encode('utf-8'))
+            return
+        
+        # API Request - Play
+        if str(self.path).startswith('/api/play'):
+            print("API Request -- Play")
+            self.wfile.write("{}".format("gonna play now").encode('utf-8'))
+            playBool = 1
+            playSong(playBool)
             return
         
 
@@ -79,12 +94,8 @@ def getSongList(self):
         database='SpandoraDB')
     cursor = ourDB.cursor()
 
-    # # Insert data into Song_Library table
-    # cursor.execute("INSERT INTO Song_Library (Song_Name, Artist_Name, Album_Name, Genre, Song_Length, Song_Path, Song_ID) VALUES (%s, %s, %s, %s, %s, %s, %s)", ("Song1", "Artist1", "Album1", "Genre1", "1:00", "Path1", "69696969"))
-    # ourDB.commit()
-
     # Query data from table
-    cursor.execute("SELECT Song_Name FROM Song_Library")
+    cursor.execute("SELECT Song_Name,Song_ID,Artist_Name FROM Song_Library")
 
     # Make JSON containing all rows for response
     r = []
@@ -101,6 +112,25 @@ def getSongList(self):
 
         # Remove apostrophes from row
         row = str(row).replace('\'', '')
+
+        # Find index of first number in row
+        index = 0
+        for i in range(len(row)):
+            if row[i].isdigit():
+                index = i
+                break
+        
+        # Replace char at index -1 with underscore
+        row = row[:index-1] + "_" + row[index-1+1:]
+
+        # Find index of last number in row
+        index = 0
+        for i in range(len(row)):
+            if row[i].isdigit():
+                index = i
+
+        # Replace char at index + 1 with underscore
+        row = row[:index+1] + "_" + row[index+1+1:]
 
         # Add each row to r
         r.append(row)
@@ -159,7 +189,7 @@ def addSongtoDB(songData):
         newID = int(row) + 1
 
     # Rename temp file to actual title
-    newPath = "../AudioFiles/" + str(newID) + "_" + title + ".mp3"
+    newPath = "../AudioFiles/" + str(newID) + ".mp3"
     os.rename("../AudioFiles/temp.mp3", newPath)
 
     # Add song to database
@@ -213,6 +243,83 @@ def removeSongfromQueue(songID):
     ourDB.close()
 
     return
+
+def playSong(bool):
+    
+    # Set local boolean in GET to global
+    playBool = bool
+
+        # Connect to database
+    ourDB = mysql.connector.connect(
+        user='william', 
+        password='changeme',
+        host='swadeslab.rose-hulman.edu',
+        database='SpandoraDB')
+    cursor = ourDB.cursor()
+
+    # Query data from table
+    cursor.execute("SELECT Song_Name,Song_ID,Artist_Name FROM Song_Library")
+
+    # Make JSON containing all rows for response
+    r = []
+
+    # Loop through each row in cursor
+    for row in cursor:
+
+        # Remove commas from row
+        row = str(row).replace(',', '')
+
+        # Remove parentheses from row
+        row = str(row).replace('(', '')
+        row = str(row).replace(')', '')
+
+        # Remove apostrophes from row
+        row = str(row).replace('\'', '')
+
+        # Find index of first number in row
+        index = 0
+        for i in range(len(row)):
+            if row[i].isdigit():
+                index = i
+                break
+        
+        # Replace char at index -1 with underscore
+        row = row[:index-1] + "_" + row[index-1+1:]
+
+        # Find index of last number in row
+        index = 0
+        for i in range(len(row)):
+            if row[i].isdigit():
+                index = i
+
+        # Replace char at index + 1 with underscore
+        row = row[:index+1] + "_" + row[index+1+1:]
+
+        # Add each row to r
+        r.append(row)
+
+    # Close connection
+    cursor.close()
+    ourDB.close()
+
+    # Print r
+    print(r)
+
+    # Return JSON response
+    return r
+
+    # Create song path
+    songPath = "../AudioFiles/" + str(songID) + ".mp3"
+    mixer.music.load(songPath)
+    mixer.music.set_volume(0.5)
+    mixer.music.play()
+    while True:
+        if playBool == 0:
+            mixer.music.pause()
+            # wait until playBool is 1
+            while playBool == 0:
+                pass
+            mixer.music.unpause()
 
 if __name__ == '__main__':
     from sys import argv
