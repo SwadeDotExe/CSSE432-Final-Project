@@ -9,7 +9,8 @@ import os
 
 my_host_name = 'localhost'
 my_port = 8080
-my_html_folder_path = '/Users/swade/Library/CloudStorage/GoogleDrive-swade@swadesdesigns.com/My Drive/College/Classes/CSSE432/FinalProject/WebServer'
+# my_html_folder_path = '/Users/swade/Library/CloudStorage/GoogleDrive-swade@swadesdesigns.com/My Drive/College/Classes/CSSE432/FinalProject/WebServer'
+my_html_folder_path = '/home/fosswe/csse432/CSSE432-Final-Project/WebServer'
 
 my_home_page_file_path = 'index.html'
 
@@ -132,6 +133,7 @@ def getSongList(self):
 if __name__ == "__main__":   
 
     httpd = socketserver.TCPServer(("", my_port), MyHttpRequestHandler)
+    httpd.allow_reuse_address = True
     print("Http Server Serving at port", my_port)     
     
     # # List files in http server directory

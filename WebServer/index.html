@@ -3,20 +3,98 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Hello Button</title>
-    <link rel="stylesheet" href="/main.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons">
+    <link rel="stylesheet" href="/styles/bootstrap-material-design.min.css">
+    <link rel="stylesheet" href="/styles/main.css">
+
+    <title>Spandora</title>
 </head>
 
 <body>
-    <div class="button-group">
-        <button id="decButton">Decrement</button>
-        <button id="resetButton">Reset</button>
-        <button id="incButton">Increment</button>
+    <div class="bmd-layout-container bmd-drawer-f-l bmd-drawer-overlay">
+        <!-- Header for big bar across top -->
+        <header class="bmd-layout-header">
+            <div class="navbar navbar-dark bg-faded justify-content-start">
+                <a id="queueTitleBar" class="navbar-brand" href="#">&nbsp;&nbsp;Spandora</a>
+            </div>
+        </header>
+        
+        <!-- Main container layout -->
+        <main class="bmd-layout-container">
+            <div id="queuePage" class="container page-container">
+                <div id="queueListContainer"></div>
+            </div>
+        </main>
     </div>
 
-    <div id="counterText">Count = 0</div>
-    <script src="/main.js"></script>
+    <button id="fab" type="button" class="btn bmd-btn-fab" data-toggle="modal" data-target="#addToQueueDialog">
+        <i class="material-icons">add</i>
+    </button>
+
+    <!-- Modal for Adding to Queue -->
+    <div class="modal fade" id="addToQueueDialog" tabindex="-1" role="dialog" aria-labelledby="Add to queue dialog" aria-hidden="true">
+        <div class="modal-dialog model-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add a Song to the Queue...</h5>
+                </div>
+
+                <div class="modal-body">
+                    <input id="songSearchBar" onkeyup="spandora.pageController.searchSongs()" type="text"
+                        name="search" placeholder="Search songs..">
+      
+                    <div id="songListContainer">
+                        <div class="card songsList">
+                            <div class="card-body">
+                                    <h5 class="card-title d-flex justify-content-between align-items-center">
+                                        <div class="songName">
+                                            Hello
+                                        </div>
+                                    </h5>
+                        
+                                    <h6 class="card-subtitle mb-2 text-muted">
+                                        <div class="artist">
+                                            Hi There
+                                        </div>
+                                    </h6>
+                            </div>
+                        </div>
+                        <div class="card songsList">
+                            <div class="card-body">
+                                    <h5 class="card-title d-flex justify-content-between align-items-center">
+                                        <div class="songName">
+                                            Goodbye
+                                        </div>
+                                    </h5>
+                        
+                                    <h6 class="card-subtitle mb-2 text-muted artist">
+                                        <div class="artist">
+                                            Nope
+                                        </div>
+                                    </h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button id="submitSongToQueue" type="button" class="btn btn-primary" data-dismiss="modal">Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- All scripts -->
+    <script src="/scripts/jquery.min.js"></script>
+    <script src="/scripts/popper.js"></script>
+    <script src="/scripts/bootstrap-material-design.js"></script>
+    <script>$("body").bootstrapMaterialDesign();</script>
+    <script src="/scripts/main.js"></script>
 </body>
+
+    
 
 </html>

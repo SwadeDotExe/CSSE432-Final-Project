@@ -1,0 +1,75 @@
+body {
+    background: #8d8c8c;
+}
+
+.navbar {
+    background-color: #0f5d00;
+    color: white;
+}
+
+.page-container {
+    margin-top: 75px;
+}
+
+#fab {
+    background: #0f5d00;
+    bottom: 10px;
+    color: white;
+    position: fixed;
+    right: 10px;
+    z-index: 999;
+}
+
+#fab:active {
+    transform: translateY(2px);
+    opacity: 0.8;
+}
+
+.bmd-layout-container,
+.bmd-layout-canvas {
+    height: 100vh;
+}
+
+.bmd-drawer-f-l>.bmd-layout-drawer {
+    width: 300px;
+    transform: translateX(-310px);
+}
+
+.bmd-layout-drawer>header {
+    background-color: #2A56C6;
+    color: white;
+}
+
+.bmd-layout-drawer>ul {
+    background-color: #DDDDDD;
+}
+
+.list-group-item {
+    background-color: #123DAD;
+    margin-top: 5px;
+}
+
+.list-group {
+    color: #DDDDDD;
+} 
+
+.material-icons {
+    color: #DDDDDD;
+}
+
+.card {
+    margin: 10px 0;
+}
+
+#listPage .card-title,
+#listPage .card-subtitle {
+    white-space: nowrap;
+    overflow: hidden;
+    display: block;
+    text-overflow: ellipsis;
+}
+
+#submitSongToQueue {
+    color: #0f5d00;
+}
+
