@@ -11,7 +11,7 @@ var spandora = spandora || {};
 
 /* globals */
 spandora.variableName = "";
-const apiUrl = "http://localhost:9000/api/";
+const apiUrl = "http://137.112.201.216:9000/api/";
 spandora.pageController = null;
 spandora.songServerManager = null;
 
@@ -27,11 +27,6 @@ spandora.PageController = class {
     /* Creates page constructor and all interactive events for buttons */
     constructor() {
         this._searchedSongID = null;
-
-        // Adding songs to queue
-		document.querySelector("#submitSongToQueue").addEventListener("click", (event) => {
-			spandora.songServerManager.addToQueue(this._searchedSongID);
-		})
 
         this.initializeView();
     }
@@ -91,31 +86,35 @@ spandora.PageController = class {
         spandora.songServerManager.getSongs()
         .then((data) => {
             console.log(data);
-            this._testUpdateSongList(data)
+            this._updateSongListHelper(data)
         })
         .catch(err => {
 			console.log(err);
 		});
 	}
 
-    _testUpdateSongList(data) {
-        let fullSongList = data;
-        for (let i = 0; i < fullSongList.length; i++) {
-            let stringData = fullSongList[i].split("_");
-            const song = new Song(stringData);
-            console.log(song);
-        }
-    }
+    // _testUpdateSongList(data) {
+    //     let fullSongList = data;
+    //     for (let i = 0; i < fullSongList.length; i++) {
+    //         let stringData = fullSongList[i].split("_");
+    //         const song = new spandora.Song(stringData);
+    //         console.log(song.songName + " " + song.id + " " + song.artist);
+    //     }
+    // }
 
     _updateSongListHelper(data) {
-        let fullSongsList = data;
+        let fullSongList = data;
         const newSongList = htmlToElement(`<div id="songListContainer"></div>`);
-        for (let i = 0; i < fullSongsList.length; i++) {
+        for (let i = 0; i < fullSongList.length; i++) {
             // Get item from json as a song
-            const song = new Song(fullSongsList[i]);
+            let stringData = fullSongList[i].split("_");
+            const song = new spandora.Song(stringData);
+            // Create songs and add them to the page
             const newSong = spandora.pageController._createListedSong(song);
-            newSong.onclick = (event) => {
-				this._searchedSongID = newSong.id;
+            let songButton = newSong.querySelector("#num" + song.id);
+            songButton.onclick = (event) => {
+				this._searchedSongID = songButton.id;
+                spandora.songServerManager.addToQueue(this._searchedSongID);
 			}
             newSongList.appendChild(newSong);
         }
@@ -140,6 +139,10 @@ spandora.PageController = class {
                         ${song.artist}
                     </div>
                 </h6>
+
+                <button id="num${song.id}" type="button" class="btn bmd-btn-fab queueFab">
+                    <i class="material-icons">add</i>
+                </button>
             </div>
         </div>`);
 	}
@@ -165,6 +168,7 @@ spandora.PageController = class {
 /** Song Class for making things easier */
 spandora.Song = class {
 	constructor(songData) {
+        console.log(songData);
 		this.songName = songData[0];
         this.id = songData[1];
 		this.artist = songData[2];

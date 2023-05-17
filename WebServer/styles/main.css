@@ -73,3 +73,8 @@ body {
     color: #0f5d00;
 }
 
+.queueFab {
+    background: #0f5d00;
+    color: white;
+    align-self: right;
+}

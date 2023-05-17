@@ -9,8 +9,8 @@ import os
 
 my_host_name = 'localhost'
 my_port = 8080
-my_html_folder_path = '/Users/swade/Library/CloudStorage/GoogleDrive-swade@swadesdesigns.com/My Drive/College/Classes/CSSE432/FinalProject/WebServer'
-#my_html_folder_path = '/home/fosswe/csse432/CSSE432-Final-Project/WebServer'
+# my_html_folder_path = '/Users/swade/Library/CloudStorage/GoogleDrive-swade@swadesdesigns.com/My Drive/College/Classes/CSSE432/FinalProject/WebServer'
+my_html_folder_path = '/home/fosswe/csse432/CSSE432-Final-Project/WebServer'
 
 my_home_page_file_path = 'index.html'
 
