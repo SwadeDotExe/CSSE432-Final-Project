@@ -4,10 +4,11 @@
 Spandora is an app that allows you to queue music to play with your friends. This is code for a web server that runs on a host machine. Users can connect to the host machine through their browser. The client program works via phone or computer, as long as it runs a modern browser. These clients will be able to view the current queue of songs, see which songs the server can play, and add songs to the queue. Additionally, clients can upload their own music files to the server to add to the queue (if the song is properly formatted). Spandora can be used socially in small group settings or commercially by restaurants and other venues.
 
 ## How to Run
-Starting the backend: python3 ./testREST.py
-Starting the web client: python3 ./webserver.py
+Starting the backend: ```python3 ./testREST.py```
 
-Note: The backend SQL database is going to be taken offline so I can pack for the summer. If you want to run the complete project, you will need to create your own database according to the schema below.
+Starting the web client: ```python3 ./webserver.py```
+
+**Note:** The backend SQL database is going to be taken offline so I can pack for the summer. If you want to run the complete project, you will need to create your own database according to the schema below.
 
 ## API Endpoints
 
