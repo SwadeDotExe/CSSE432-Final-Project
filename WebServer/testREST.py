@@ -374,7 +374,7 @@ def playSong():
     # Create song path
     songPath = "../AudioFiles/" + str(songID) + ".mp3"
     mixer.music.load(songPath)
-    mixer.music.set_volume(0.5)
+    mixer.music.set_volume(1.0)
     mixer.music.play()
 
     # Remove song from queue
