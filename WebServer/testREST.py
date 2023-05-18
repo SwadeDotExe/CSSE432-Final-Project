@@ -329,11 +329,47 @@ def getSongQueue():
 
 def playSong():
 
-    # Get songs in queue
-    songsInQueue = getSongQueue()
+    # Check if song is already playing
+    if mixer.music.get_busy():
+        print("Song already playing")
+        return
+    
+
+    # Connect to database
+    ourDB = mysql.connector.connect(
+        user='william', 
+        password='changeme',
+        host='swadeslab.rose-hulman.edu',
+        database='SpandoraDB')
+    cursor = ourDB.cursor()
+
+    # Query data from table
+    cursor.execute("SELECT Song_ID FROM Queue")
 
     # Get first song in queue
-    songID = songsInQueue[0]
+    songID = 0
+    for row in cursor:
+                
+        # Remove commas from row
+        row = str(row).replace(',', '')
+
+        # Remove parentheses from row
+        row = str(row).replace('(', '')
+        row = str(row).replace(')', '')
+
+        # Remove apostrophes from row
+        row = str(row).replace('\'', '')
+
+        # Add each row to r
+        songID = row
+        break
+
+    # See if song is in queue
+    if songID == 0:
+        print("No songs in queue")
+        return
+
+    print(songID)
 
     # Create song path
     songPath = "../AudioFiles/" + str(songID) + ".mp3"
