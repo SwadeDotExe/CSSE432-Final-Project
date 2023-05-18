@@ -95,6 +95,12 @@ class S(BaseHTTPRequestHandler):
             # Parse data
             post_data = post_data.decode('utf-8')
 
+            # Remove the first 5 characters
+            post_data = post_data[14:]
+
+            # Remove the last 2 characters
+            post_data = post_data[:-2]
+
             # Add the song to queue
             addSongtoQueue(post_data) # Expecting songID
             return
@@ -304,6 +310,15 @@ def getSongQueue():
 
         # Add each row to r
         songQueue.append(row)
+
+    # Get song information for each row
+    for i in range(len(songQueue)):
+        cursor.execute("SELECT Song_Name,Artist_Name,Album_Name FROM Song_Library WHERE Song_ID = %s", (songQueue[i],))
+        for row in cursor:
+            songQueue[i] = row
+
+    # Convert songQueue to JSON
+    songQueue = json.dumps(songQueue)
 
     # Close connection
     cursor.close()
