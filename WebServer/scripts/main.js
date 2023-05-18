@@ -14,6 +14,7 @@ spandora.variableName = "";
 const apiUrl = "http://137.112.201.216:9000/api/";
 spandora.pageController = null;
 spandora.songServerManager = null;
+spandora.startedPlaying = false;
 
 // From: stack overflow
 function htmlToElement(html) {
@@ -28,11 +29,32 @@ spandora.PageController = class {
     constructor() {
         this._searchedSongID = null;
 
+        document.querySelector("#playBtn").onclick = (event) => {
+            if (spandora.startedPlaying == false) {
+                spandora.songServerManager.playSong();
+                spandora.startedPlaying = true;
+            }
+            else {
+                spandora.songServerManager.resumeSong();
+            }
+		}
+
+        document.querySelector("#pauseBtn").onclick = (event) => {
+			spandora.songServerManager.pauseSong();
+		}
+
+        document.querySelector("#skipBtn").onclick = (event) => {
+			spandora.songServerManager.skipSong();
+		}
+
+        document.querySelector('form').addEventListener('submit', 
+            spandora.songServerManager.uploadSong());
+
         this.initializeView();
     }
 
     initializeView() {
-        // this.updateQueue();
+        this.updateQueue();
         this.updateSongList();
     }
 
@@ -49,10 +71,10 @@ spandora.PageController = class {
 
     _updateQueueHelper(data) {
         let fullQueueList = data;
-        const newQueue = htmlToElement(`<div id="queueListContainer"></div>`);
+        const newQueue = htmlToElement(`<div id="queueListContainer" class="songQueueDiv"></div>`);
 		for (let i = 0; i < fullQueueList.length; i++) {
             // Get item from json
-            const song = new Song(data[i]);
+            const song = new spandora.SongFromQueue(fullQueueList[i]);
 			const newSong = this._createQueuedSong(song);
 			newQueue.appendChild(newSong);
 		}
@@ -93,28 +115,25 @@ spandora.PageController = class {
 		});
 	}
 
-    // _testUpdateSongList(data) {
-    //     let fullSongList = data;
-    //     for (let i = 0; i < fullSongList.length; i++) {
-    //         let stringData = fullSongList[i].split("_");
-    //         const song = new spandora.Song(stringData);
-    //         console.log(song.songName + " " + song.id + " " + song.artist);
-    //     }
-    // }
-
     _updateSongListHelper(data) {
         let fullSongList = data;
-        const newSongList = htmlToElement(`<div id="songListContainer"></div>`);
+        const newSongList = htmlToElement(`<div id="songListContainer" class="songListDiv"></div>`);
         for (let i = 0; i < fullSongList.length; i++) {
             // Get item from json as a song
             let stringData = fullSongList[i].split("_");
-            const song = new spandora.Song(stringData);
+            const song = new spandora.SongFromList(stringData);
             // Create songs and add them to the page
             const newSong = spandora.pageController._createListedSong(song);
             let songButton = newSong.querySelector("#num" + song.id);
             songButton.onclick = (event) => {
 				this._searchedSongID = songButton.id;
-                spandora.songServerManager.addToQueue(this._searchedSongID);
+                spandora.songServerManager.addToQueue(this._searchedSongID)
+                .then((response) => {
+                    this.updateQueue();
+                })
+                .catch(err => {
+                    console.log(err);
+                });
 			}
             newSongList.appendChild(newSong);
         }
@@ -140,9 +159,11 @@ spandora.PageController = class {
                     </div>
                 </h6>
 
-                <button id="num${song.id}" type="button" class="btn bmd-btn-fab queueFab">
-                    <i class="material-icons">add</i>
-                </button>
+                <div class="text-center">
+                    <button id="num${song.id}" type="button" class="btn bmd-btn-fab queueFab">
+                        <i class="material-icons">add</i>
+                    </button>
+                </div>
             </div>
         </div>`);
 	}
@@ -166,12 +187,21 @@ spandora.PageController = class {
 }
 
 /** Song Class for making things easier */
-spandora.Song = class {
+spandora.SongFromList = class {
 	constructor(songData) {
-        console.log(songData);
+        // console.log(songData);
 		this.songName = songData[0];
         this.id = songData[1];
 		this.artist = songData[2];
+	}
+}
+
+spandora.SongFromQueue = class {
+	constructor(songData) {
+        // console.log(songData);
+		this.songName = songData[0];
+        this.artist = songData[1];
+		this.album = songData[2];
 	}
 }
 
@@ -208,19 +238,71 @@ spandora.SongServerManager = class {
     }
 
     addToQueue(songID) {
-        let data = {songID};
-        fetch(apiUrl + "insert/", {
-			method: "POST",
-			headers: {"Content-Type": "application/json"},
-			body: JSON.stringify(data)
-		})
-		.catch (err => {
-			console.log(err);
-		})
+        return new Promise((resolve, reject) => {
+            let data = {songID};
+            fetch(apiUrl + "insert/", {
+                method: "POST",
+			    headers: {"Content-Type": "application/json"},
+			    body: JSON.stringify(data)
+            })
+            .then((response) => {
+                console.log("Song added to queue.");
+                resolve(data);
+            })
+            .catch(err => {
+                reject(err);
+            });
+        });
     }
 
-    addSongToServer() {
+    uploadSong(event) {
+        const form = event.currentTarget;
+        const formData = new FormData(form);
+        const fetchOptions = {
+            method: "POST",
+            body: formData,
+        };
 
+        fetch(apiUrl + "create/", fetchOptions)
+        .then((response) => {
+            console.log("Successfully uploaded file.")
+        })
+        .catch(err => {
+            console.log("File upload failed.");
+        });
+
+        event.preventDefault();
+    }
+
+    playSong() {
+        fetch(apiUrl + "play/")
+        .then((response) => {
+            console.log("Song started playing.");
+        });
+    }
+
+    pauseSong() {
+        fetch(apiUrl + "pause/")
+        .then((response) => {
+            console.log("Paused song.");
+        });
+    }
+
+    resumeSong() {
+        fetch(apiUrl + "resume/")
+        .then((response) => {
+            console.log("Resumed song.");
+        });
+    }
+
+    skipSong() {
+        fetch(apiUrl + "stop/")
+        .then((response) => {
+            fetch(apiUrl + "play/")
+            .then((response) => {
+                console.log("Skipped to next song.");
+            });
+        });
     }
 }
 
