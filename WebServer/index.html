@@ -17,7 +17,7 @@
         <!-- Header for big bar across top -->
         <header class="bmd-layout-header">
             <div class="navbar navbar-dark bg-faded justify-content-start">
-                <a id="queueTitleBar" class="navbar-brand" href="#">&nbsp;&nbsp;Spandora</a>
+                <a id="queueTitleBar" class="navbar-brand"href="#"><img src="/Spandora.png" width="2.5%" height="auto">&nbsp;&nbsp;Spandora</a>
             </div>
         </header>
         
@@ -107,11 +107,19 @@
                 </div>
 
                 <div class="modal-body">
-                    <div id="songUploadBox" class="">
+                    <label for="fileupload" class="drop-container">
+                        <span class="drop-title">Drop Files Here</span>
+                        or
+                        <input type="file" id="fileupload">
+                    </label>
+                    <div class="text-center">
+                        <button type="button" class="btn uploadButton" id="submitUpload">Upload</button>
+                    </div>
+                    <!-- <div id="songUploadBox" class="">
                         <label for="fileupload">File</label>
                         <input id="fileupload" name="file" type="file" />
                         <button id="submitUpload">Upload</button>
-                    </div>
+                    </div> -->
                 </div>
 
                 <div class="modal-footer">

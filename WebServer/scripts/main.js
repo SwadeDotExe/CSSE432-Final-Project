@@ -52,6 +52,8 @@ spandora.PageController = class {
         } 
 
         this.initializeView();
+
+        setInterval(this.initializeView(), 20000);
     }
 
     initializeView() {
