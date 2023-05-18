@@ -4,11 +4,15 @@
 Spandora is an app that allows you to queue music to play with your friends. This is code for a web server that runs on a host machine. Users can connect to the host machine through their browser. The client program works via phone or computer, as long as it runs a modern browser. These clients will be able to view the current queue of songs, see which songs the server can play, and add songs to the queue. Additionally, clients can upload their own music files to the server to add to the queue (if the song is properly formatted). Spandora can be used socially in small group settings or commercially by restaurants and other venues.
 
 ## How to Run
-Starting the backend: ```python3 ./testREST.py```
+First navigate to the ```/WebServer``` directory.
 
-Starting the web client: ```python3 ./webserver.py```
+Starting the backend (API): ```python3 ./testREST.py```
 
-**Note:** The backend SQL database is going to be taken offline so I can pack for the summer. If you want to run the complete project, you will need to create your own database according to the schema below.
+Starting the web server: ```python3 ./webserver.py```
+
+At this point, you should be able to go to the web client in your browser through localhost (or the IP of the machine) on port 8080. The backend API runs on port 9000. (You can change both of these port numbers by modifying various places in the code). *However,* you will not be able to use the API without changing the API at the top of the file ```scripts/main.js```. You will want to change line 14 to be ```const apiUrl = "http://changeme:9000/api/";``` where changeme is your local machine IP or localhost.
+
+**Note:** The backend MySQL database is going to be taken offline so I can pack for the summer. If you want to run the complete project, you will need to create your own MySQL database according to the schema below. You will also likely need to change the API code to reflect the new domain and login of the database. If you plan on using a real password or secure database, you should probably look into using encryption instead of putting it in plaintext like it is here.
 
 ## API Endpoints
 
@@ -35,6 +39,9 @@ Starting the web client: ```python3 ./webserver.py```
 | stopSong()            | None          | None        | Stops the currently playing or paused song                               |
 
 ## Database Schema
+
+### Song Library
+The Song Library keeps track of all songs that the server has as well as their respective file locations. It also tracks all other metadata for songs like the artist name and album name, and a unique integer ID for each song. This ID is used for retrieving specific information and identification by the frontend JavaScript and also for use in the Queue (essentially it is a primary key for Song Library and foreign key for Queue).
 | **Column** | **Type** | **Description** |
 |------------|----------|-----------------|
 | Song_Name  | String   | Name of song    |
@@ -45,3 +52,8 @@ Starting the web client: ```python3 ./webserver.py```
 | Song_Path  | String   | Path to file    |
 | Song_ID    | Integer  | Unique ID       |
 
+### Queue
+The Queue just keeps track of all current songs in the queue by ID (a foreign key for the ID in Song Library), and when songs finish playing or are skipped then they are removed from the queue. Likewise, adding a song from the web client will make a database call to add a song to the queue. If you write your own implementation of the database schema, this could instead be implemented as a server-side data structure. The downside of that approach is your queue will not persist between server crashes or restarts.
+| **Column** | **Type** | **Description** |
+|------------|----------|-----------------|
+| Song_ID    | Integer  | Unique ID       |
