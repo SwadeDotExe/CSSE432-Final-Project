@@ -133,7 +133,7 @@ def getSongList(self):
 if __name__ == "__main__":   
 
     httpd = socketserver.TCPServer(("", my_port), MyHttpRequestHandler)
-    httpd.allow_reuse_address = True
+    #httpd.allow_reuse_address = True
     print("Http Server Serving at port", my_port)     
     
     # # List files in http server directory
