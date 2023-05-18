@@ -47,8 +47,9 @@ spandora.PageController = class {
 			spandora.songServerManager.skipSong();
 		}
 
-        document.querySelector('form').addEventListener('submit', 
-            spandora.songServerManager.uploadSong());
+        document.querySelector("#submitUpload").onclick = (event) => {
+            spandora.songServerManager.uploadSong();
+        } 
 
         this.initializeView();
     }
@@ -255,9 +256,10 @@ spandora.SongServerManager = class {
         });
     }
 
-    uploadSong(event) {
-        const form = event.currentTarget;
-        const formData = new FormData(form);
+    uploadSong() {
+        let formData = new FormData(); 
+        let fileupload = document.querySelector("#fileupload");
+        formData.append("file", fileupload.files[0]);
         const fetchOptions = {
             method: "POST",
             body: formData,
@@ -270,8 +272,6 @@ spandora.SongServerManager = class {
         .catch(err => {
             console.log("File upload failed.");
         });
-
-        event.preventDefault();
     }
 
     playSong() {
