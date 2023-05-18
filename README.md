@@ -1,6 +1,9 @@
 # CSSE432-Final-Project
 
-## API Endpoints:
+## Spandora Project Description
+Spandora is an app that allows you to queue music to play with your friends. This is code for a web server that runs on a host machine. Users can connect to the host machine through their browser. The client program works via phone or computer, as long as it runs a modern browser. These clients will be able to view the current queue of songs, see which songs the server can play, and add songs to the queue. Additionally, clients can upload their own music files to the server to add to the queue (if the song is properly formatted). Spandora can be used socially in small group settings or commercially by restaurants and other venues.
+
+## API Endpoints
 
 | **API Endpoint** | **Type** | **Returns** | **Description**                                                          |
 |------------------|----------|-------------|--------------------------------------------------------------------------|
