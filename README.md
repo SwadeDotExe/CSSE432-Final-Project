@@ -23,3 +23,14 @@
 | playSong()            | None          | None        | Begins playing song at top of queue, then removes from queue             |
 | pauseSong()           | None          | None        | Pauses the currently playing song                                        |
 | stopSong()            | None          | None        | Stops the currently playing or paused song                               |
+
+## Database Schema
+| **Column** | **Type** | **Description** |
+|------------|----------|-----------------|
+| Song_Name  | String   | Name of song    |
+| Song_ID    | String   | Unique ID       |
+| Artist_Name| String   | Name of artist  |
+| Album_Name | String   | Name of album   |
+| File_Name  | String   | Name of file    |
+| File_Path  | String   | Path to file    |
+
