@@ -28,9 +28,10 @@
 | **Column** | **Type** | **Description** |
 |------------|----------|-----------------|
 | Song_Name  | String   | Name of song    |
-| Song_ID    | String   | Unique ID       |
 | Artist_Name| String   | Name of artist  |
 | Album_Name | String   | Name of album   |
-| File_Name  | String   | Name of file    |
-| File_Path  | String   | Path to file    |
+| Genre      | String   | Genre of song   |
+| Song_Length| Double   | Song length (s) |
+| Song_Path  | String   | Path to file    |
+| Song_ID    | Integer  | Unique ID       |
 
